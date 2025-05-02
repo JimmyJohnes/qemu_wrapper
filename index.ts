@@ -1,6 +1,6 @@
 import path from "node:path"
 import fs from "node:fs"
-import { execSync } from "node:child_process";
+import { execSync,exec } from "node:child_process";
 import { QEMUImage } from "./image.model";
 import { ISOImage } from "./iso.model";
 import { VM } from "./vm.model";
@@ -158,7 +158,7 @@ class QEMU{
   public createVirtualMachineUsingImage(name:string, iso:ISOImage, memory: number,image:QEMUImage){
     if(!image.location!) return {status: "failed", message: "Disk image doesn't exist"}
     try {
-      execSync(`qemu-system-x86_64 -enable-kvm -cdrom ${iso.location} -boot menu=on -drive file=${image.location} -m ${memory}G`);
+      exec(`qemu-system-x86_64 -enable-kvm -cdrom ${iso.location} -boot menu=on -drive file=${image.location} -m ${memory}G`, (error,stdout)=>{});
       let vm  = new VM(name,iso,memory,image);
       return{
         status: "success",
@@ -178,4 +178,3 @@ let qemu = new QEMU("vms");
 let image = qemu.createVirtualDisk("foo",15,"qcow2");
 let ManjaroIso = new ISOImage("Manjaro","/home/jimmy/ISO/manjaro-kde-24.0.6-240812-linux69.iso")
 let vm = qemu.createVirtualMachineUsingImage("idk",ManjaroIso,8,image.image!);
-
